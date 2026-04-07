@@ -1,5 +1,6 @@
 package com.leets.assignment.global.exception;
 
+import com.leets.assignment.domain.post.exception.PostNotFoundException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -49,5 +50,13 @@ public class GlobalExceptionHandler {
                 .build();
 
         return ResponseEntity.badRequest().body(response);
+    }
+
+    // 기존 코드 아래에 추가
+    @ExceptionHandler(PostNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handlePostNotFoundException(PostNotFoundException e) {
+        return ResponseEntity
+                .status(org.springframework.http.HttpStatus.NOT_FOUND) // 404 에러
+                .body(ExceptionResponse.of("POST404_1", e.getMessage())); // 명세서 코드!
     }
 }

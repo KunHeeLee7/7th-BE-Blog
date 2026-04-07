@@ -5,6 +5,7 @@ import com.leets.assignment.domain.post.dto.res.PostResponseDTO;
 import com.leets.assignment.domain.post.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,5 +20,10 @@ public class PostController {
             @Valid @RequestBody PostRequestDTO.CreatePostDTO request
     ) {
         return postService.createPost(request);
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostResponseDTO.PostDetailResDTO> getPost(@PathVariable Long postId) {
+        return ResponseEntity.ok(postService.getPost(postId));
     }
 }

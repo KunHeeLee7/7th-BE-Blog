@@ -4,28 +4,30 @@ import com.leets.assignment.domain.post.dto.req.PostRequestDTO;
 import com.leets.assignment.domain.post.dto.res.PostResponseDTO;
 import com.leets.assignment.domain.post.entity.Post;
 import com.leets.assignment.domain.post.entity.PostBlock;
+import com.leets.assignment.domain.post.exception.PostNotFoundException;
 import com.leets.assignment.domain.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.stream.Collectors;
-
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true) // 기본적으로 읽기 전용으로 설정 (성능 최적화)
 public class PostService {
 
     private final PostRepository postRepository;
 
-    @Transactional
+    /**
+     * 게시글 생성
+     */
+    @Transactional // 쓰기 작업이므로 readOnly = false (기본값) 적용
     public PostResponseDTO.PostDetailResDTO createPost(PostRequestDTO.CreatePostDTO request) {
         // 1. Post 엔티티 생성
         Post post = Post.builder()
                 .title(request.getTitle())
                 .build();
 
-        // 2. DTO의 블록들을 엔티티로 변환하여 Post에 추가
+        // 2. 블록 추가 로직
         request.getBlocks().forEach(blockDto -> {
             PostBlock block = PostBlock.builder()
                     .sequence(blockDto.getSequence())
@@ -36,24 +38,23 @@ public class PostService {
             post.getBlocks().add(block);
         });
 
-        // 3. DB 저장 (CascadeType.ALL 설정으로 블록도 같이 저장)
+        // 3. DB 저장
         Post savedPost = postRepository.save(post);
 
-        // 4. 저장된 엔티티를 응답 DTO로 변환해서 반환
-        return PostResponseDTO.PostDetailResDTO.builder()
-                .postId(savedPost.getPostId())
-                .title(savedPost.getTitle())
-                .nickname("가천대가나디") // 우선 고정값으로 테스트
-                .blocks(savedPost.getBlocks().stream()
-                        .map(b -> PostResponseDTO.BlockResDTO.builder()
-                                .blockId(b.getBlockId())
-                                .sequence(b.getSequence())
-                                .blockType(b.getBlockType())
-                                .content(b.getContent())
-                                .build())
-                        .collect(Collectors.toList()))
-                .createdAt(savedPost.getCreatedAt())
-                .updatedAt(savedPost.getUpdatedAt())
-                .build();
+        // 4. 저장된 엔티티를 DTO로 변환하여 반환 (미리 만든 from 메서드 활용)
+        return PostResponseDTO.PostDetailResDTO.from(savedPost);
+    }
+
+    /**
+     * 게시글 상세 조회
+     */
+    public PostResponseDTO.PostDetailResDTO getPost(Long postId) {
+        // 1. DB에서 ID로 조회
+        // 2. 데이터가 없으면 우리가 만든 PostNotFoundException 예외 발생! (-> 404 응답)
+        Post post = postRepository.findById(postId)
+                .orElseThrow(PostNotFoundException::new);
+
+        // 3. 찾은 엔티티를 DTO로 변환하여 반환
+        return PostResponseDTO.PostDetailResDTO.from(post);
     }
 }
