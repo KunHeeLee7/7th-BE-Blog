@@ -21,7 +21,7 @@ public class PostResponseDTO {
             return PostListResDTO.builder()
                     .postId(post.getPostId())
                     .title(post.getTitle())
-                    .nickname(post.getUser() != null ? post.getUser().getNickname() : "익명")
+                    .nickname(post.getUser() != null ? post.getUser().getNickname() : "알 수 없음")
                     .createdAt(post.getCreatedAt())
                     .build();
         }
@@ -42,7 +42,7 @@ public class PostResponseDTO {
             return PostDetailResDTO.builder()
                     .postId(post.getPostId())
                     .title(post.getTitle())
-                    .nickname(post.getUser() != null ? post.getUser().getNickname() : "가천대가나디")
+                    .nickname(post.getUser() != null ? post.getUser().getNickname() : "알 수 없음")
                     .createdAt(post.getCreatedAt())
                     .updatedAt(post.getUpdatedAt())
                     .blocks(post.getBlocks().stream()
