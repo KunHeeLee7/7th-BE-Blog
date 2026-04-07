@@ -4,6 +4,8 @@ import com.leets.assignment.global.baseEntity.BaseEntity;
 import com.leets.assignment.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,5 +34,9 @@ public class Post extends BaseEntity {
     private Post(String title, User user) {
         this.title = title;
         this.user = user;
+    }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
     }
 }

@@ -39,4 +39,6 @@ public class PostRequestDTO {
         @NotBlank(message = "내용을 입력해주세요.") // 각 블록의 내용이 비었을 때
         private String content;
     }
+
+
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -51,18 +52,31 @@ public class PostService {
         // 1. DB에서 ID로 조회
         // 2. 데이터가 없으면 우리가 만든 PostNotFoundException 예외 발생! (-> 404 응답)
         Post post = postRepository.findById(postId)
+                .filter(p -> p.getDeletedAt() == null) // 삭제 안 된 것만 필터링
                 .orElseThrow(PostNotFoundException::new);
 
         // 3. 찾은 엔티티를 DTO로 변환하여 반환
         return PostResponseDTO.PostDetailResDTO.from(post);
     }
 
-    // 게시글 전체 목록 조회 (추가됨)
+    // 게시글 전체 목록 조회
     public List<PostResponseDTO.PostListResDTO> getPostList() {
         // DB의 모든 글을 가져와서 ListResDTO로 변환
         return postRepository.findAll().stream()
+                .filter(post -> post.getDeletedAt() == null) // 삭제된 글 제외
                 .map(PostResponseDTO.PostListResDTO::from)
                 .collect(Collectors.toList());
     }
 
+    // 소프트 딜리트 로직
+    @Transactional
+    public void deletePost(Long postId) {
+        // 1. 존재하는 글인지 확인
+        Post post = postRepository.findById(postId)
+                .filter(p -> p.getDeletedAt() == null) // 이미 삭제된 건 없는 걸로 침
+                .orElseThrow(PostNotFoundException::new);
+
+        // 2. setDeletedAt 대신 softDelete() 호출!
+        post.softDelete();
+    }
 }
