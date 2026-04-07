@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true) // 기본적으로 읽기 전용으로 설정 (성능 최적화)
@@ -17,9 +20,7 @@ public class PostService {
 
     private final PostRepository postRepository;
 
-    /**
-     * 게시글 생성
-     */
+    // 게시글 생성
     @Transactional // 쓰기 작업이므로 readOnly = false (기본값) 적용
     public PostResponseDTO.PostDetailResDTO createPost(PostRequestDTO.CreatePostDTO request) {
         // 1. Post 엔티티 생성
@@ -45,9 +46,7 @@ public class PostService {
         return PostResponseDTO.PostDetailResDTO.from(savedPost);
     }
 
-    /**
-     * 게시글 상세 조회
-     */
+    // 게시글 상세 조회
     public PostResponseDTO.PostDetailResDTO getPost(Long postId) {
         // 1. DB에서 ID로 조회
         // 2. 데이터가 없으면 우리가 만든 PostNotFoundException 예외 발생! (-> 404 응답)
@@ -57,4 +56,13 @@ public class PostService {
         // 3. 찾은 엔티티를 DTO로 변환하여 반환
         return PostResponseDTO.PostDetailResDTO.from(post);
     }
+
+    // 게시글 전체 목록 조회 (추가됨)
+    public List<PostResponseDTO.PostListResDTO> getPostList() {
+        // DB의 모든 글을 가져와서 ListResDTO로 변환
+        return postRepository.findAll().stream()
+                .map(PostResponseDTO.PostListResDTO::from)
+                .collect(Collectors.toList());
+    }
+
 }
