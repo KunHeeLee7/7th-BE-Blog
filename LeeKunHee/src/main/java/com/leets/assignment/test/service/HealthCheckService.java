@@ -1,6 +1,6 @@
-package com.leets.assignment.service;
+package com.leets.assignment.test.service;
 
-import com.leets.assignment.dto.HealthCheckResponseDto;
+import com.leets.assignment.test.dto.HealthCheckResponseDto;
 import org.springframework.stereotype.Service;
 
 @Service

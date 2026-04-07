@@ -1,8 +1,8 @@
-package com.leets.assignment.controller;
+package com.leets.assignment.test.controller;
 
-import com.leets.assignment.dto.RepeatRequestDto;
-import com.leets.assignment.dto.RepeatResponseDto;
-import com.leets.assignment.service.StringRepeatService;
+import com.leets.assignment.test.dto.RepeatRequestDto;
+import com.leets.assignment.test.dto.RepeatResponseDto;
+import com.leets.assignment.test.service.StringRepeatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;

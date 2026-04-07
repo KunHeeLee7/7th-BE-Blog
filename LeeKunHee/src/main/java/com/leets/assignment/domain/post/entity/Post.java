@@ -1,7 +1,7 @@
-package com.leets.assignment.entity.post;
+package com.leets.assignment.domain.post.entity;
 
-import com.leets.assignment.entity.baseEntity.BaseEntity;
-import com.leets.assignment.entity.user.User;
+import com.leets.assignment.global.baseEntity.BaseEntity;
+import com.leets.assignment.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.ArrayList;

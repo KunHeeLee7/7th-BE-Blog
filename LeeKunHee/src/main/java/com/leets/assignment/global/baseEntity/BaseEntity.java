@@ -1,4 +1,4 @@
-package com.leets.assignment.entity.baseEntity;
+package com.leets.assignment.global.baseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

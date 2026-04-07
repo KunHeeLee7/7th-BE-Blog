@@ -1,4 +1,4 @@
-package com.leets.assignment.entity.post;
+package com.leets.assignment.domain.post.entity;
 
 import jakarta.persistence.*;
 import lombok.*;

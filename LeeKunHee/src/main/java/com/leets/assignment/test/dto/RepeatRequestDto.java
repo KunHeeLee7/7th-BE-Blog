@@ -1,4 +1,4 @@
-package com.leets.assignment.dto;
+package com.leets.assignment.test.dto;
 
 public class RepeatRequestDto {
     private String value;

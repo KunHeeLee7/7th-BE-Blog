@@ -1,7 +1,7 @@
-package com.leets.assignment.controller;
+package com.leets.assignment.test.controller;
 
-import com.leets.assignment.dto.HealthCheckResponseDto;
-import com.leets.assignment.service.HealthCheckService;
+import com.leets.assignment.test.dto.HealthCheckResponseDto;
+import com.leets.assignment.test.service.HealthCheckService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

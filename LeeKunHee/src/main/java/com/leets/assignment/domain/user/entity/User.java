@@ -1,6 +1,6 @@
-package com.leets.assignment.entity.user;
+package com.leets.assignment.domain.user.entity;
 
-import com.leets.assignment.entity.baseEntity.BaseEntity;
+import com.leets.assignment.global.baseEntity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

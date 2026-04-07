@@ -1,8 +1,8 @@
-package com.leets.assignment.entity.comment;
+package com.leets.assignment.domain.comment.entity;
 
-import com.leets.assignment.entity.baseEntity.BaseEntity;
-import com.leets.assignment.entity.user.User;
-import com.leets.assignment.entity.post.Post;
+import com.leets.assignment.global.baseEntity.BaseEntity;
+import com.leets.assignment.domain.user.entity.User;
+import com.leets.assignment.domain.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 
