@@ -4,8 +4,11 @@ import com.leets.assignment.domain.post.dto.req.PostRequestDTO;
 import com.leets.assignment.domain.post.dto.res.PostResponseDTO;
 import com.leets.assignment.domain.post.entity.Post;
 import com.leets.assignment.domain.post.entity.PostBlock;
+import com.leets.assignment.domain.post.exception.PostForbiddenException;
 import com.leets.assignment.domain.post.exception.PostNotFoundException;
 import com.leets.assignment.domain.post.repository.PostRepository;
+import com.leets.assignment.domain.user.entity.User;
+import com.leets.assignment.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,13 +23,20 @@ import java.time.LocalDateTime;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final UserRepository userRepository;
 
     // 게시글 생성
     @Transactional // 쓰기 작업이므로 readOnly = false (기본값) 적용
     public PostResponseDTO.PostDetailResDTO createPost(PostRequestDTO.CreatePostDTO request) {
+
+        // 0. 실제 DB에서 유저 조회
+        User user = userRepository.findById(request.getUserId())
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 유저입니다."));
+
         // 1. Post 엔티티 생성
         Post post = Post.builder()
                 .title(request.getTitle())
+                .user(user)
                 .build();
 
         // 2. 블록 추가 로직
@@ -70,16 +80,22 @@ public class PostService {
 
     // 소프트 딜리트 로직
     @Transactional
-    public void deletePost(Long postId) {
+    public void deletePost(Long postId, Long userId) {
         // 1. 존재하는 글인지 확인
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getDeletedAt() == null) // 이미 삭제된 건 없는 걸로 침
                 .orElseThrow(PostNotFoundException::new);
 
-        // 2. setDeletedAt 대신 softDelete() 호출!
+        // 2. 삭제 권한 확인
+        if (!post.getUser().getUserId().equals(userId)) {
+            throw new PostForbiddenException();
+        }
+
+        // 3. softDelete() 호출!
         post.softDelete();
     }
 
+    // 게시글 수정
     @Transactional
     public PostResponseDTO.PostDetailResDTO updatePost(Long postId, PostRequestDTO.UpdatePostDTO request) {
         // 1. 게시글 존재 및 삭제 여부 확인 (없으면 POST404_1 발생)
@@ -87,10 +103,15 @@ public class PostService {
                 .filter(p -> p.getDeletedAt() == null)
                 .orElseThrow(PostNotFoundException::new);
 
-        // 2. 제목 수정 (Dirty Checking)
+        // 2. 작성자 ID 대조 (정석 로직)
+        if (!post.getUser().getUserId().equals(request.getUserId())) {
+            throw new PostForbiddenException();
+        }
+
+        // 3. 제목 수정 (Dirty Checking)
         post.update(request.getTitle());
 
-        // 3. 블록 수정 (기존 블록 비우고 새로 추가)
+        // 4. 블록 수정 (기존 블록 비우고 새로 추가)
         post.getBlocks().clear();
         request.getBlocks().forEach(blockDto -> {
             PostBlock block = PostBlock.builder()

@@ -56,8 +56,11 @@ public class PostController {
 
     // 5. 게시글 삭제
     @DeleteMapping("/{postId}")
-    public ApiResponse<Void> deletePost(@PathVariable Long postId) {
-        postService.deletePost(postId);
+    public ApiResponse<Void> deletePost(
+            @PathVariable Long postId,
+            @RequestParam Long userId // 쿼리 파라미터(?userId=1)로 작성자 ID를 받음
+    ) {
+        postService.deletePost(postId, userId);
         // 삭제는 반환할 데이터가 없으므로 result에 null을 넣습니다.
         return ApiResponse.onSuccess("POST200_4", "게시글 삭제에 성공했습니다.", null);
     }

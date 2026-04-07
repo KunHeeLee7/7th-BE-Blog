@@ -46,6 +46,9 @@ public class PostRequestDTO {
     @Getter
     @NoArgsConstructor
     public static class UpdatePostDTO {
+        @NotNull(message = "수정자 ID는 필수입니다.") // 권한 확인을 위해
+        private Long userId;
+
         @NotBlank(message = "제목을 입력해주세요.")
         @Size(max = 255, message = "제목은 최대 255자까지 가능합니다.")
         private String title;
