@@ -18,7 +18,6 @@ public class PostController {
     public PostResponseDTO.PostDetailResDTO createPost(
             @Valid @RequestBody PostRequestDTO.CreatePostDTO request
     ) {
-        // 우선 ApiResponse 없이 DTO만 반환해서 잘 나오는지 확인해봅시다!
         return postService.createPost(request);
     }
 }
