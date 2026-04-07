@@ -79,4 +79,29 @@ public class PostService {
         // 2. setDeletedAt 대신 softDelete() 호출!
         post.softDelete();
     }
+
+    @Transactional
+    public PostResponseDTO.PostDetailResDTO updatePost(Long postId, PostRequestDTO.UpdatePostDTO request) {
+        // 1. 게시글 존재 및 삭제 여부 확인 (없으면 POST404_1 발생)
+        Post post = postRepository.findById(postId)
+                .filter(p -> p.getDeletedAt() == null)
+                .orElseThrow(PostNotFoundException::new);
+
+        // 2. 제목 수정 (Dirty Checking)
+        post.update(request.getTitle());
+
+        // 3. 블록 수정 (기존 블록 비우고 새로 추가)
+        post.getBlocks().clear();
+        request.getBlocks().forEach(blockDto -> {
+            PostBlock block = PostBlock.builder()
+                    .sequence(blockDto.getSequence())
+                    .blockType(blockDto.getBlockType())
+                    .content(blockDto.getContent())
+                    .post(post)
+                    .build();
+            post.getBlocks().add(block);
+        });
+
+        return PostResponseDTO.PostDetailResDTO.from(post);
+    }
 }

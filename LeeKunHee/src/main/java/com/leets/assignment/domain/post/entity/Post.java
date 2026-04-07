@@ -39,4 +39,8 @@ public class Post extends BaseEntity {
     public void softDelete() {
         this.deletedAt = LocalDateTime.now();
     }
+
+    public void update(String title) {
+        this.title = title;
+    }
 }

@@ -49,4 +49,14 @@ public class PostController {
         // 삭제는 반환할 데이터가 없으므로 result에 null을 넣습니다.
         return ApiResponse.onSuccess("POST200_4", "게시글 삭제에 성공했습니다.", null);
     }
+
+    // 5. 게시글 수정
+    @PatchMapping("/{postId}")
+    public ApiResponse<PostResponseDTO.PostDetailResDTO> updatePost(
+            @PathVariable Long postId,
+            @Valid @RequestBody PostRequestDTO.UpdatePostDTO request
+    ) {
+        PostResponseDTO.PostDetailResDTO result = postService.updatePost(postId, request);
+        return ApiResponse.onSuccess("POST200_3", "게시글이 수정되었습니다.", result);
+    }
 }
