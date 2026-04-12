@@ -4,8 +4,8 @@ import com.leets.assignment.domain.post.dto.req.PostRequestDTO;
 import com.leets.assignment.domain.post.dto.res.PostResponseDTO;
 import com.leets.assignment.domain.post.entity.Post;
 import com.leets.assignment.domain.post.entity.PostBlock;
-import com.leets.assignment.domain.post.exception.PostForbiddenException;
-import com.leets.assignment.domain.post.exception.PostNotFoundException;
+import com.leets.assignment.domain.post.exception.code.PostErrorCode;
+import com.leets.assignment.domain.post.exception.PostException;
 import com.leets.assignment.domain.post.repository.PostRepository;
 import com.leets.assignment.domain.user.entity.User;
 import com.leets.assignment.domain.user.repository.UserRepository;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -60,10 +59,10 @@ public class PostService {
     // 게시글 상세 조회
     public PostResponseDTO.PostDetailResDTO getPost(Long postId) {
         // 1. DB에서 ID로 조회
-        // 2. 데이터가 없으면 우리가 만든 PostNotFoundException 예외 발생! (-> 404 응답)
+        // 2. 데이터가 없으면 PostNotFoundException 예외 발생! (-> 404 응답)
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getDeletedAt() == null) // 삭제 안 된 것만 필터링
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
 
         // 3. 찾은 엔티티를 DTO로 변환하여 반환
         return PostResponseDTO.PostDetailResDTO.from(post);
@@ -84,11 +83,11 @@ public class PostService {
         // 1. 존재하는 글인지 확인
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getDeletedAt() == null) // 이미 삭제된 건 없는 걸로 침
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
 
         // 2. 삭제 권한 확인
         if (!post.getUser().getUserId().equals(userId)) {
-            throw new PostForbiddenException();
+            throw new PostException(PostErrorCode.POST_FORBIDDEN);
         }
 
         // 3. softDelete() 호출!
@@ -101,11 +100,11 @@ public class PostService {
         // 1. 게시글 존재 및 삭제 여부 확인 (없으면 POST404_1 발생)
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getDeletedAt() == null)
-                .orElseThrow(PostNotFoundException::new);
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
 
-        // 2. 작성자 ID 대조 (정석 로직)
+        // 2. 수정 권한 확인
         if (!post.getUser().getUserId().equals(request.getUserId())) {
-            throw new PostForbiddenException();
+            throw new PostException(PostErrorCode.POST_FORBIDDEN);
         }
 
         // 3. 제목 수정 (Dirty Checking)

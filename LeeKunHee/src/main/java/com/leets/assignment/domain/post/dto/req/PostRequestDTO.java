@@ -15,14 +15,14 @@ public class PostRequestDTO {
     @Getter
     @NoArgsConstructor
     public static class PostBaseDTO {
-        @NotBlank(message = "제목을 입력해주세요.")
-        @Size(max = 255, message = "제목은 최대 255자까지 가능합니다.")
+        @NotBlank(message = "POST400_1|제목을 입력해주세요.")
+        @Size(max = 255, message = "POST400_2|제목은 최대 255자까지 가능합니다.")
         private String title;
 
-        @NotNull(message = "사용자 ID는 필수입니다.")
+        @NotNull(message = "COMMON400_1|사용자 ID는 필수입니다.")
         private Long userId;
 
-        @NotEmpty(message = "내용을 입력해주세요.")
+        @NotEmpty(message = "POST400_3|내용을 입력해주세요.")
         @Valid // 내부 블록들의 검증을 수행하기 위해 필수!
         private List<BlockDTO> blocks;
     }
@@ -31,13 +31,13 @@ public class PostRequestDTO {
     @Getter
     @NoArgsConstructor
     public static class BlockDTO {
-        @NotNull(message = "순서는 필수입니다.")
+        @NotNull(message = "COMMON400_1|순서는 필수입니다.")
         private Integer sequence;
 
-        @NotNull(message = "블록 타입은 필수입니다.")
+        @NotNull(message = "COMMON400_1|블록 타입은 필수입니다.")
         private BlockType blockType;
 
-        @NotBlank(message = "내용을 입력해주세요.") // 각 블록의 내용이 비었을 때
+        @NotBlank(message = "POST400_3|내용을 입력해주세요.") // 각 블록의 내용이 비었을 때
         private String content;
     }
 

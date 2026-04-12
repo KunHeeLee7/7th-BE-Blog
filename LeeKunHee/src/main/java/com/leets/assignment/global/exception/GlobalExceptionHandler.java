@@ -1,6 +1,7 @@
 package com.leets.assignment.global.exception;
 
-import com.leets.assignment.domain.post.exception.PostNotFoundException;
+import com.leets.assignment.domain.post.exception.code.PostErrorCode;
+import com.leets.assignment.domain.post.exception.PostException;
 import com.leets.assignment.global.common.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -12,40 +13,43 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    /**
-     * [POST400_1, POST400_2] @Valid 필드 검증 실패 처리
-     * 명세서의 특정 에러 코드와 메시지 형식에 맞춥니다.
-     */
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
-        // 발생한 에러 중 첫 번째 필드 에러를 가져옴
+        // 1. DTO에 적힌 메시지 추출
         FieldError fieldError = e.getBindingResult().getFieldError();
+        String rawMessage = e.getBindingResult().getFieldError().getDefaultMessage();
 
-        String errorCode = "COMMON400"; // 기본 에러 코드
-        String errorMessage = "입력값이 유효하지 않습니다.";
+        String code = "COMMON400";
+        String message = rawMessage;
 
-        if (fieldError != null) {
-            String constraint = fieldError.getCode(); // NotBlank, Size 등
-            String field = fieldError.getField();     // title, blocks 등
-
-            // 1. 제목이나 내용(블록)이 비었을 때 (POST400_1)
-            if ("NotBlank".equals(constraint) || "NotEmpty".equals(constraint)) {
-                errorCode = "POST400_1";
-                errorMessage = "제목과 내용을 입력해주세요.";
-            }
-            // 2. 제목 글자 수 초과 시 (POST400_2)
-            else if ("Size".equals(constraint) && "title".equals(field)) {
-                errorCode = "POST400_2";
-                errorMessage = "제목은 최대 255자까지 가능합니다.";
-            }
+        // 2. 구분자가 있다면 쪼개기
+        if (rawMessage != null && rawMessage.contains("|")) {
+            String[] parts = rawMessage.split("\\|");
+            code = parts[0];
+            message = parts[1];
         }
 
         return ResponseEntity.badRequest().body(
                 ApiResponse.<Void>builder()
                         .isSuccess(false)
-                        .code(errorCode)
-                        .message(errorMessage)
-                        .result(null)
+                        .code(code)
+                        .message(message)
+                        .build()
+        );
+    }
+
+    /**
+     * Post 관련 모든 커스텀 예외 처리
+     */
+    @ExceptionHandler(PostException.class)
+    public ResponseEntity<ApiResponse<Void>> handlePostException(PostException e) {
+        PostErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity.status(errorCode.getHttpStatus()).body(
+                ApiResponse.<Void>builder()
+                        .isSuccess(false)
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
                         .build()
         );
     }
@@ -65,20 +69,6 @@ public class GlobalExceptionHandler {
         );
     }
 
-    /**
-     * [POST404_1] 게시글을 찾을 수 없음 (상세조회, 수정, 삭제 공통)
-     */
-    @ExceptionHandler(PostNotFoundException.class)
-    public ResponseEntity<ApiResponse<Void>> handlePostNotFoundException(PostNotFoundException e) {
-        return ResponseEntity.status(404).body(
-                ApiResponse.<Void>builder()
-                        .isSuccess(false)
-                        .code("POST404_1")
-                        .message("해당 게시글이 존재하지 않습니다.")
-                        .result(null)
-                        .build()
-        );
-    }
 
     /**
      * [COMMON500_1] 기타 예기치 못한 서버 에러
