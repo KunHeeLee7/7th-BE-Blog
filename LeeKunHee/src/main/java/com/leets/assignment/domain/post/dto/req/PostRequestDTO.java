@@ -12,15 +12,14 @@ import java.util.List;
 
 public class PostRequestDTO {
 
-    // 게시글 생성용 DTO
     @Getter
     @NoArgsConstructor
-    public static class CreatePostDTO {
+    public static class PostBaseDTO {
         @NotBlank(message = "제목을 입력해주세요.")
         @Size(max = 255, message = "제목은 최대 255자까지 가능합니다.")
         private String title;
 
-        @NotNull(message = "작성자 ID는 필수입니다.")
+        @NotNull(message = "사용자 ID는 필수입니다.")
         private Long userId;
 
         @NotEmpty(message = "내용을 입력해주세요.")
@@ -42,20 +41,10 @@ public class PostRequestDTO {
         private String content;
     }
 
-    // 게시글 수정용 DTO
-    @Getter
-    @NoArgsConstructor
-    public static class UpdatePostDTO {
-        @NotNull(message = "수정자 ID는 필수입니다.") // 권한 확인을 위해
-        private Long userId;
+    // 게시물 생성용 DTO
+    public static class CreatePostDTO extends PostBaseDTO {}
 
-        @NotBlank(message = "제목을 입력해주세요.")
-        @Size(max = 255, message = "제목은 최대 255자까지 가능합니다.")
-        private String title;
-
-        @NotEmpty(message = "내용을 입력해주세요.") // 리스트가 비어있으면 거부
-        @Valid
-        private List<BlockDTO> blocks;
-    }
+    // 게시물 수정용 DTO
+    public static class UpdatePostDTO extends PostBaseDTO {}
 
 }
