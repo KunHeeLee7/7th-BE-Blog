@@ -65,4 +65,13 @@ public class PostController {
         return ApiResponse.onSuccess("POST200_4", "게시글 삭제에 성공했습니다.", null);
     }
 
+    // 6. 게시글 숨기기
+    @PatchMapping("/{postId}/hide")
+    public ApiResponse<Void> hidePost(
+            @PathVariable Long postId,
+            @RequestParam Long userId // 실제로는 인증된 유저 정보를 사용해야 함
+    ) {
+        postService.hidePost(postId, userId);
+        return ApiResponse.onSuccess("POST200_5", "게시글이 숨김 처리되었습니다.", null);
+    }
 }

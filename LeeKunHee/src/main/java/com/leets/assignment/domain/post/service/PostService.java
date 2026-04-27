@@ -4,6 +4,7 @@ import com.leets.assignment.domain.post.dto.req.PostRequestDTO;
 import com.leets.assignment.domain.post.dto.res.PostResponseDTO;
 import com.leets.assignment.domain.post.entity.Post;
 import com.leets.assignment.domain.post.entity.PostBlock;
+import com.leets.assignment.domain.post.entity.PostStatus;
 import com.leets.assignment.domain.post.exception.code.PostErrorCode;
 import com.leets.assignment.domain.post.exception.PostException;
 import com.leets.assignment.domain.post.repository.PostRepository;
@@ -62,6 +63,7 @@ public class PostService {
         // 2. 데이터가 없으면 PostNotFoundException 예외 발생! (-> 404 응답)
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getDeletedAt() == null) // 삭제 안 된 것만 필터링
+                .filter(p -> p.getStatus() == PostStatus.ACTIVE) // 활성 상태 필터링
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
 
         // 3. 찾은 엔티티를 DTO로 변환하여 반환
@@ -73,6 +75,7 @@ public class PostService {
         // DB의 모든 글을 가져와서 ListResDTO로 변환
         return postRepository.findAll().stream()
                 .filter(post -> post.getDeletedAt() == null) // 삭제된 글 제외
+                .filter(post -> post.getStatus() == PostStatus.ACTIVE) // 활성 상태 필터링 
                 .map(PostResponseDTO.PostListResDTO::from)
                 .collect(Collectors.toList());
     }
@@ -102,15 +105,20 @@ public class PostService {
                 .filter(p -> p.getDeletedAt() == null)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
 
-        // 2. 수정 권한 확인
+        // 2. 관리자가 숨긴 글은 수정 불가
+        if (post.getStatus() == PostStatus.HIDDEN_BY_ADMIN) {
+            throw new PostException(PostErrorCode.POST_FORBIDDEN); // 혹은 전용 에러 코드 사용
+        }
+
+        // 3. 수정 권한 확인
         if (!post.getUser().getUserId().equals(request.getUserId())) {
             throw new PostException(PostErrorCode.POST_FORBIDDEN);
         }
 
-        // 3. 제목 수정 (Dirty Checking)
+        // 4. 제목 수정 (Dirty Checking)
         post.update(request.getTitle());
 
-        // 4. 블록 수정 (기존 블록 비우고 새로 추가)
+        // 5. 블록 수정 (기존 블록 비우고 새로 추가)
         post.getBlocks().clear();
         request.getBlocks().forEach(blockDto -> {
             PostBlock block = PostBlock.builder()
@@ -124,4 +132,23 @@ public class PostService {
 
         return PostResponseDTO.PostDetailResDTO.from(post);
     }
+
+    // 게시글 숨김
+    @Transactional
+    public void hidePost(Long postId, Long userId) {
+        // 1. 게시글 존재 및 삭제 여부 확인
+        Post post = postRepository.findById(postId)
+                .filter(p -> p.getDeletedAt() == null)
+                .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
+
+        // 2. 권한 확인 (관리자 기능이 없다면 우선 작성자 혹은 특정 조건 확인)
+        if (!post.getUser().getUserId().equals(userId)) {
+            throw new PostException(PostErrorCode.POST_FORBIDDEN);
+        }
+
+        // 3. 상태 변경 (ACTIVE -> HIDDEN)
+        post.hideByUser();
+    }
+
+
 }

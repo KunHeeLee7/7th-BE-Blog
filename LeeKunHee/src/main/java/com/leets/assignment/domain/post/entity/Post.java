@@ -23,6 +23,10 @@ public class Post extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private PostStatus status = PostStatus.ACTIVE;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id") // FK 컬럼명 명시
     private User user;
@@ -34,6 +38,20 @@ public class Post extends BaseEntity {
     private Post(String title, User user) {
         this.title = title;
         this.user = user;
+        this.status = PostStatus.ACTIVE;
+    }
+
+
+    public void hideByUser() {
+        this.status = PostStatus.HIDDEN_BY_USER;
+    }
+
+    public void hideByAdmin() {
+        this.status = PostStatus.HIDDEN_BY_ADMIN;
+    }
+
+    public void unhide() {
+        this.status = PostStatus.ACTIVE;
     }
 
     public void softDelete() {
