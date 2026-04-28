@@ -2,6 +2,8 @@ package com.leets.assignment.global.exception;
 
 import com.leets.assignment.domain.post.exception.code.PostErrorCode;
 import com.leets.assignment.domain.post.exception.PostException;
+import com.leets.assignment.domain.report.exception.ReportException;
+import com.leets.assignment.domain.report.exception.code.ReportErrorCode;
 import com.leets.assignment.global.common.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -69,6 +71,20 @@ public class GlobalExceptionHandler {
         );
     }
 
+    /**
+     * [REPORT400] ReportException
+     */
+    @ExceptionHandler(ReportException.class)
+    public ResponseEntity<ApiResponse<Void>> handleReportException(ReportException e) {
+        ReportErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity.status(errorCode.getHttpStatus()).body(
+                ApiResponse.<Void>builder()
+                        .isSuccess(false)
+                        .code(errorCode.getCode())
+                        .message(errorCode.getMessage())
+                        .build()
+        );
+    }
 
     /**
      * [COMMON500_1] 기타 예기치 못한 서버 에러

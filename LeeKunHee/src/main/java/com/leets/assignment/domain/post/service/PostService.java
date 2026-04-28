@@ -136,13 +136,15 @@ public class PostService {
     // 게시글 숨김
     @Transactional
     public void hidePost(Long postId, Long userId) {
+
         // 1. 게시글 존재 및 삭제 여부 확인
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getDeletedAt() == null)
                 .orElseThrow(() -> new PostException(PostErrorCode.POST_NOT_FOUND));
 
         // 2. 권한 확인 (관리자 기능이 없다면 우선 작성자 혹은 특정 조건 확인)
-        if (!post.getUser().getUserId().equals(userId)) {
+        // post.getUser()가 null인지 먼저 확인하거나, equals를 활용
+        if (post.getUser() == null || !post.getUser().getUserId().equals(userId)) {
             throw new PostException(PostErrorCode.POST_FORBIDDEN);
         }
 
