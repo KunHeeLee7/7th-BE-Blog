@@ -23,4 +23,12 @@ public class PostReportController {
         PostReportResponseDTO response = postReportService.reportPost(postId, request.reporterId(), request.reason());
         return ApiResponse.onSuccess("REPORT201", "신고가 정상적으로 접수되었습니다.", response);
     }
+
+    @PatchMapping("/reports/{reportId}/resolve")
+    public ApiResponse<PostReportResponseDTO> resolveReport(
+            @PathVariable Long reportId
+    ) {
+        PostReportResponseDTO response = postReportService.resolveReport(reportId);
+        return ApiResponse.onSuccess("REPORT200_1", "신고 처리가 완료되어 해당 게시글이 숨겨졌습니다.", response);
+    }
 }
