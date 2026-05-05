@@ -8,7 +8,6 @@ import com.leets.assignment.global.common.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,11 +15,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
-public class PostController {
+public class PostController implements PostApi{
 
     private final PostService postService;
 
     // 1. 게시글 작성
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<PostResponseDTO.PostDetailResDTO> createPost(
@@ -31,6 +31,7 @@ public class PostController {
     }
 
     // 2. 게시글 전체 목록 조회
+    @Override
     @GetMapping
     public ApiResponse<List<PostResponseDTO.PostListResDTO>> getPostList() {
         List<PostResponseDTO.PostListResDTO> result = postService.getPostList();
@@ -38,6 +39,7 @@ public class PostController {
     }
 
     // 3. 게시글 상세 조회
+    @Override
     @GetMapping("/{postId}")
     public ApiResponse<PostResponseDTO.PostDetailResDTO> getPost(@PathVariable Long postId) {
         PostResponseDTO.PostDetailResDTO result = postService.getPost(postId);
@@ -45,6 +47,7 @@ public class PostController {
     }
 
     // 4. 게시글 수정
+    @Override
     @PatchMapping("/{postId}")
     public ApiResponse<PostResponseDTO.PostDetailResDTO> updatePost(
             @PathVariable Long postId,
@@ -55,17 +58,18 @@ public class PostController {
     }
 
     // 5. 게시글 삭제
+    @Override
     @DeleteMapping("/{postId}")
     public ApiResponse<Void> deletePost(
             @PathVariable Long postId,
             @RequestParam Long userId // 쿼리 파라미터(?userId=1)로 작성자 ID를 받음
     ) {
         postService.deletePost(postId, userId);
-        // 삭제는 반환할 데이터가 없으므로 result에 null을 넣습니다.
         return ApiResponse.onSuccess("POST200_4", "게시글 삭제에 성공했습니다.", null);
     }
 
     // 6. 게시글 숨기기
+    @Override
     @PatchMapping("/{postId}/hide")
     public ApiResponse<Void> hidePost(
             @PathVariable Long postId,

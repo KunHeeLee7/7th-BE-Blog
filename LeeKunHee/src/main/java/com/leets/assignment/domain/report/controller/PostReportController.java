@@ -11,10 +11,11 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
-public class PostReportController {
+public class PostReportController implements PostReportApi {
 
     private final PostReportService postReportService;
 
+    @Override
     @PostMapping("/{postId}/reports")
     public ApiResponse<PostReportResponseDTO> createReport(
             @PathVariable Long postId,
@@ -24,6 +25,7 @@ public class PostReportController {
         return ApiResponse.onSuccess("REPORT201", "신고가 정상적으로 접수되었습니다.", response);
     }
 
+    @Override
     @PatchMapping("/reports/{reportId}/resolve")
     public ApiResponse<PostReportResponseDTO> resolveReport(
             @PathVariable Long reportId
