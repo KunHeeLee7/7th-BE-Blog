@@ -20,9 +20,9 @@ public class AuthResponseDTO {
     public record TokenResDTO(
             @Schema(description = "토큰 타입", example = "Bearer")
             String tokenType,
-            @Schema(description = "Access Token")
+            @Schema(description = "Access Token", example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidXNlcklkIjoxLCJuaWNrbmFtZSI6ImxlZXRzIiwiY2F0ZWdvcnkiOiJhY2Nlc3MiLCJpYXQiOjE3MTYxOTAwMDAsImV4cCI6MTcxNjE5MzYwMH0.sample-signature")
             String accessToken,
-            @Schema(description = "Refresh Token")
+            @Schema(description = "Refresh Token", example = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0QGV4YW1wbGUuY29tIiwidXNlcklkIjoxLCJuaWNrbmFtZSI6ImxlZXRzIiwiY2F0ZWdvcnkiOiJyZWZyZXNoIiwiaWF0IjoxNzE2MTkwMDAwLCJleHAiOjE3MTczOTk2MDB9.sample-signature")
             String refreshToken
     ) {
     }
