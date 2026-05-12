@@ -25,4 +25,22 @@ public interface AuthApi {
                             examples = @ExampleObject(value = "{\"isSuccess\": false, \"code\": \"USER409_2\", \"message\": \"이미 등록된 닉네임입니다.\", \"result\": null}")))
     })
     ApiResponse<AuthResponseDTO.SignupResDTO> signup(@RequestBody AuthRequestDTO.SignupDTO request);
+
+    @Operation(summary = "로그인", description = "이메일과 비밀번호로 로그인하고 Access Token과 Refresh Token을 발급받습니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401_1", description = "비밀번호 불일치",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(value = "{\"isSuccess\": false, \"code\": \"AUTH401_1\", \"message\": \"비밀번호가 일치하지 않습니다.\", \"result\": null}")))
+    })
+    ApiResponse<AuthResponseDTO.TokenResDTO> login(@RequestBody AuthRequestDTO.LoginDTO request);
+
+    @Operation(summary = "토큰 재발급", description = "Refresh Token으로 새로운 Access Token과 Refresh Token을 발급받습니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "토큰 재발급 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401_4", description = "유효하지 않은 Refresh Token",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class),
+                            examples = @ExampleObject(value = "{\"isSuccess\": false, \"code\": \"AUTH401_4\", \"message\": \"유효하지 않은 Refresh Token입니다.\", \"result\": null}")))
+    })
+    ApiResponse<AuthResponseDTO.TokenResDTO> reissue(@RequestBody AuthRequestDTO.ReissueDTO request);
 }
