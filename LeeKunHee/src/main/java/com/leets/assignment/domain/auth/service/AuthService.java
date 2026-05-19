@@ -5,6 +5,9 @@ import com.leets.assignment.domain.auth.dto.AuthResponseDTO;
 import com.leets.assignment.domain.auth.exception.AuthException;
 import com.leets.assignment.domain.auth.exception.code.AuthErrorCode;
 import com.leets.assignment.domain.auth.jwt.JwtProvider;
+import com.leets.assignment.domain.auth.oauth.KakaoClient;
+import com.leets.assignment.domain.auth.oauth.dto.KakaoUserInfoResponse;
+import com.leets.assignment.domain.user.entity.AuthProvider;
 import com.leets.assignment.domain.user.entity.User;
 import com.leets.assignment.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +23,7 @@ public class AuthService {
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final KakaoClient kakaoClient;
 
     @Transactional
     public AuthResponseDTO.SignupResDTO signup(AuthRequestDTO.SignupDTO request) {
@@ -31,6 +35,7 @@ public class AuthService {
                 .nickname(request.getNickname())
                 .name(request.getName())
                 .password(passwordEncoder.encode(request.getPassword()))
+                .provider(AuthProvider.LOCAL)
                 .build();
 
         User savedUser = userService.save(user);
@@ -59,5 +64,47 @@ public class AuthService {
         User user = userService.findByEmail(email);
 
         return jwtProvider.createTokenResponse(user);
+    }
+
+    @Transactional
+    public AuthResponseDTO.TokenResDTO kakaoLogin(String code) {
+        KakaoUserInfoResponse kakaoUserInfo = kakaoClient.getUserInfo(code);
+
+        User user = userService.findByProviderAndProviderId(AuthProvider.KAKAO, kakaoUserInfo.getProviderId())
+                .orElseGet(() -> createKakaoUser(kakaoUserInfo));
+
+        return jwtProvider.createTokenResponse(user);
+    }
+
+    private User createKakaoUser(KakaoUserInfoResponse kakaoUserInfo) {
+        String nickname = limitLength(kakaoUserInfo.getNicknameOrDefault(), 50);
+        String email = kakaoUserInfo.getEmailOrDefault();
+
+        if (userService.existsByNickname(nickname)) {
+            nickname = limitLength("kakao_" + kakaoUserInfo.getProviderId(), 50);
+        }
+
+        if (userService.existsByEmail(email)) {
+            email = kakaoUserInfo.getProviderId() + "@kakao.local";
+        }
+
+        User user = User.builder()
+                .email(email)
+                .nickname(nickname)
+                .name(limitLength(kakaoUserInfo.getNameOrDefault(), 50))
+                .password("")
+                .provider(AuthProvider.KAKAO)
+                .providerId(kakaoUserInfo.getProviderId())
+                .build();
+
+        return userService.save(user);
+    }
+
+    private String limitLength(String value, int maxLength) {
+        if (value.length() <= maxLength) {
+            return value;
+        }
+
+        return value.substring(0, maxLength);
     }
 }

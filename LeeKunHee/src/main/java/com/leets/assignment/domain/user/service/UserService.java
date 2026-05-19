@@ -1,5 +1,6 @@
 package com.leets.assignment.domain.user.service;
 
+import com.leets.assignment.domain.user.entity.AuthProvider;
 import com.leets.assignment.domain.user.entity.User;
 import com.leets.assignment.domain.user.exception.UserException;
 import com.leets.assignment.domain.user.exception.code.UserErrorCode;
@@ -7,6 +8,8 @@ import com.leets.assignment.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,10 @@ public class UserService {
     public User findByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    public Optional<User> findByProviderAndProviderId(AuthProvider provider, String providerId) {
+        return userRepository.findByProviderAndProviderId(provider, providerId);
     }
 
     public void validateEmailNotDuplicated(String email) {

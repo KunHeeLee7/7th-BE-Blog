@@ -27,11 +27,20 @@ public class User extends BaseEntity {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", length = 20)
+    private AuthProvider provider;
+
+    @Column(name = "provider_id", unique = true)
+    private String providerId;
+
     @Builder
-    private User(String nickname, String name, String password, String email) {
+    private User(String nickname, String name, String password, String email, AuthProvider provider, String providerId) {
         this.nickname = nickname;
         this.name = name;
         this.password = password;
         this.email = email;
+        this.provider = provider;
+        this.providerId = providerId;
     }
 }

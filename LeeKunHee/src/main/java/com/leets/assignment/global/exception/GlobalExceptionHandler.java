@@ -15,6 +15,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -94,6 +95,20 @@ public class GlobalExceptionHandler {
                         .isSuccess(false)
                         .code("COMMON400_1")
                         .message("잘못된 요청입니다. JSON 형식을 확인해주세요.")
+                        .result(null)
+                        .build()
+        );
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiResponse<Void>> handleMissingServletRequestParameterException(
+            MissingServletRequestParameterException e
+    ) {
+        return ResponseEntity.badRequest().body(
+                ApiResponse.<Void>builder()
+                        .isSuccess(false)
+                        .code("COMMON400_2")
+                        .message("필수 요청 파라미터가 누락되었습니다: " + e.getParameterName())
                         .result(null)
                         .build()
         );

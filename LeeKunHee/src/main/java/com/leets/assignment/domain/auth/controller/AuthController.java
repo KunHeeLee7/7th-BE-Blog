@@ -7,9 +7,11 @@ import com.leets.assignment.global.common.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -44,5 +46,14 @@ public class AuthController implements AuthApi {
     ) {
         AuthResponseDTO.TokenResDTO result = authService.reissue(request);
         return ApiResponse.onSuccess("AUTH200_2", "토큰 재발급이 성공했습니다.", result);
+    }
+
+    @Override
+    @GetMapping("/auth/kakao/callback")
+    public ApiResponse<AuthResponseDTO.TokenResDTO> kakaoLogin(
+            @RequestParam String code
+    ) {
+        AuthResponseDTO.TokenResDTO result = authService.kakaoLogin(code);
+        return ApiResponse.onSuccess("AUTH200_3", "카카오 로그인이 성공했습니다.", result);
     }
 }

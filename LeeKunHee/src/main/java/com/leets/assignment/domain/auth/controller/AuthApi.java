@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "03. Auth API", description = "회원가입 및 로그인 API")
 public interface AuthApi {
@@ -43,4 +44,11 @@ public interface AuthApi {
                             examples = @ExampleObject(value = "{\"isSuccess\": false, \"code\": \"AUTH401_4\", \"message\": \"유효하지 않은 Refresh Token입니다.\", \"result\": null}")))
     })
     ApiResponse<AuthResponseDTO.TokenResDTO> reissue(@RequestBody AuthRequestDTO.ReissueDTO request);
+
+    @Operation(summary = "카카오 로그인", description = "카카오 인가 코드를 받아 서비스 Access Token과 Refresh Token을 발급합니다.")
+    @ApiResponses({
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "카카오 로그인 성공"),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "AUTH401_2", description = "유효하지 않은 카카오 인가 코드 또는 토큰")
+    })
+    ApiResponse<AuthResponseDTO.TokenResDTO> kakaoLogin(@RequestParam String code);
 }
