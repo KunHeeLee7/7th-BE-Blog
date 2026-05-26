@@ -53,5 +53,10 @@ jobs:
             cd "$PROJECT_PATH"
             git pull origin "$BRANCH"
             printf '%s' "$APPLICATION_YML" > application.yml
-            docker compose -f docker-compose.yml down
-            docker compose -f docker-compose.yml up -d --build
+            if docker compose version >/dev/null 2>&1; then
+              docker compose -f docker-compose.yml down
+              docker compose -f docker-compose.yml up -d --build
+            else
+              docker-compose -f docker-compose.yml down
+              docker-compose -f docker-compose.yml up -d --build
+            fi
