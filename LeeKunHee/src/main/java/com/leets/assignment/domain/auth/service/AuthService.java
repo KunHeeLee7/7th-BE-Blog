@@ -5,7 +5,7 @@ import com.leets.assignment.domain.auth.dto.AuthResponseDTO;
 import com.leets.assignment.domain.auth.exception.AuthException;
 import com.leets.assignment.domain.auth.exception.code.AuthErrorCode;
 import com.leets.assignment.domain.auth.jwt.JwtProvider;
-import com.leets.assignment.domain.auth.oauth.KakaoClient;
+import com.leets.assignment.domain.auth.oauth.client.KakaoClient;
 import com.leets.assignment.domain.auth.oauth.dto.KakaoUserInfoResponse;
 import com.leets.assignment.domain.user.entity.AuthProvider;
 import com.leets.assignment.domain.user.entity.User;

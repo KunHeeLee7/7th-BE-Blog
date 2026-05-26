@@ -1,4 +1,4 @@
-package com.leets.assignment.domain.auth.oauth;
+package com.leets.assignment.domain.auth.oauth.client;
 
 import com.leets.assignment.domain.auth.exception.AuthException;
 import com.leets.assignment.domain.auth.exception.code.AuthErrorCode;

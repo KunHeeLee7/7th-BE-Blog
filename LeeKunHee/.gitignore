@@ -46,3 +46,4 @@ HELP.md
 # Environment files
 .env
 .env.*
+application.yml
