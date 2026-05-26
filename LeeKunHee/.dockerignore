@@ -1,0 +1,12 @@
+.git
+.github
+.gradle
+.idea
+build
+out
+target
+*.iml
+*.log
+.env
+.env.*
+application.yml
