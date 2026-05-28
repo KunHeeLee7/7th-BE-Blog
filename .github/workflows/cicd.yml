@@ -3,7 +3,7 @@ name: CI/CD
 on:
   push:
     branches:
-      - main
+      - "이건희/main"
   workflow_dispatch:
 
 jobs:
