@@ -42,13 +42,17 @@ jobs:
         env:
           APPLICATION_YML: ${{ secrets.APPLICATION_YML }}
           PROJECT_PATH: ${{ secrets.PROJECT_PATH }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
           BRANCH: ${{ github.ref_name }}
         with:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USERNAME }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: ${{ secrets.SERVER_PORT || 22 }}
-          envs: APPLICATION_YML,PROJECT_PATH,BRANCH
+          envs: APPLICATION_YML,PROJECT_PATH,MYSQL_DATABASE,MYSQL_USER,MYSQL_PASSWORD,MYSQL_ROOT_PASSWORD,BRANCH
           script: |
             cd "$PROJECT_PATH"
             git pull origin "$BRANCH"
